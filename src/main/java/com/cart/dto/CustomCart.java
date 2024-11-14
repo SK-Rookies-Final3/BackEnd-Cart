@@ -2,40 +2,11 @@ package com.cart.dto;
 
 import java.util.List;
 
+// 커스텀 장바구니 DTO
 public class CustomCart {
+    private String userId;          // 사용자 ID
+    private String customCartName;  // 커스텀 장바구니 이름
+    private List<CustomCartItem> items;  // 커스텀 장바구니 아이템 리스트
 
-    private Long id;
-    private String cartName;
-    private List<CustomCartItem> items;
-
-    // Constructor, Getters, Setters
-    public CustomCart(Long id, String cartName, List<CustomCartItem> items) {
-        this.id = id;
-        this.cartName = cartName;
-        this.items = items;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getCartName() {
-        return cartName;
-    }
-
-    public void setCartName(String cartName) {
-        this.cartName = cartName;
-    }
-
-    public List<CustomCartItem> getItems() {
-        return items;
-    }
-
-    public void setItems(List<CustomCartItem> items) {
-        this.items = items;
-    }
+    // getters and setters
 }
