@@ -1,10 +1,7 @@
-package com.cart.repository;
+package com.cart.db;
 
-import com.cart.dto.Cart;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-// 장바구니 Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
-    Cart findByUserId(String userId);
+    Cart findByUserId(String userId);  // 사용자 ID로 장바구니 조회
 }
-
