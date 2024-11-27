@@ -1,10 +1,10 @@
 package com.cart.util;
 
-import org.springframework.web.server.ServerWebExchange;
+import javax.servlet.http.HttpServletRequest;
 
 public class HeaderUtils {
 
-    public static String getUserIdFromHeaders(ServerWebExchange exchange) {
-        return exchange.getRequest().getHeaders().getFirst("X-User-Id");
+    public static String getUserIdFromHeaders(HttpServletRequest request) {
+        return request.getHeader("X-User-Id");  // "X-User-Id" 헤더에서 사용자 ID 추출
     }
 }
