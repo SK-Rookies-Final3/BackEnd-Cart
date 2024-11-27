@@ -10,7 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+
 
 @RestController
 @RequestMapping("/api/cart")
@@ -55,7 +56,7 @@ public class CartController {
     }
 
     // 커스텀 장바구니 등록
-    @PostMapping("/custom")
+    @PostMapping("/custom/items")
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<CustomCart> createCustomCart(@RequestBody CustomCart customCart, HttpServletRequest request) {
         CustomCart createdCart = customCartService.createCustomCart(customCart, request);
