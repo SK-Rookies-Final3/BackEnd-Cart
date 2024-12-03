@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 public class CustomCartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;  // 기본 키 (커스텀 장바구니 상품 ID)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "custom_cart_id")  // 커스텀 장바구니와의 관계 설정
-    private CustomCart customCart;  // 어느 커스텀 장바구니에 속하는지
+    @JoinColumn(name = "custom_cart_code") //
+    private CustomCart customCart;
 
     @Column(name = "product_code", nullable = false, length = 50)
     private String productCode;

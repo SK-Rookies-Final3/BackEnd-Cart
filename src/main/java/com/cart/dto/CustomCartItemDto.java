@@ -1,9 +1,9 @@
 package com.cart.dto;
 
-public class CustomCartItem {
+public class CustomCartItemDto {
     private String productCode;  // 상품 코드
     private String productName;  // 상품명
-    private String productImage; // 상품 이미지 URL
+    private String thumbnail_url; // 상품 이미지 URL
     private int quantity;        // 수량
     private String size;         // 사이즈
     private String color;        // 색상
@@ -27,12 +27,12 @@ public class CustomCartItem {
         this.productName = productName;
     }
 
-    public String getProductImage() {
-        return productImage;
+    public String getThumbnail_url() {
+        return thumbnail_url;
     }
 
-    public void setProductImage(String productImage) {
-        this.productImage = productImage;
+    public void setThumbnail_url(String thumbnail_url) {
+        this.thumbnail_url = thumbnail_url;
     }
 
     public int getQuantity() {
@@ -59,19 +59,19 @@ public class CustomCartItem {
         this.color = color;
     }
 
-    public int getxCoordinate() {
+    public int getXCoordinate() {
         return xCoordinate;
     }
 
-    public void setxCoordinate(int xCoordinate) {
+    public void setXCoordinate(int xCoordinate) {
         this.xCoordinate = xCoordinate;
     }
 
-    public int getyCoordinate() {
+    public int getYCoordinate() {
         return yCoordinate;
     }
 
-    public void setyCoordinate(int yCoordinate) {
-        this.yCoordinate = yCoordinate;
+    public void setYCoordinate(int YCoordinate) {
+        this.yCoordinate = YCoordinate;
     }
 }

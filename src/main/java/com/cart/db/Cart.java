@@ -14,11 +14,11 @@ import java.util.List;
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int code;  // 장바구니 code
+    private int code;
 
     @Column(name = "user_id", nullable = false, length = 50)
-    private String userId;  // 사용자 ID
+    private String userId;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItem> items;  // 장바구니의 상품들
+    private List<CartItem> items;
 }

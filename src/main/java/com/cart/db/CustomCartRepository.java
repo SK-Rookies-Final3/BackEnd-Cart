@@ -1,7 +1,9 @@
 package com.cart.db;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
 
 public interface CustomCartRepository extends JpaRepository<CustomCart, Long> {
-    CustomCart findByUserId(String userId);  // 사용자 ID로 커스텀 장바구니 조회
+    Optional<CustomCart> findByUserId(String userId);
+    Optional<CustomCart> findByCustomCartTitle(String customCartTitle);
 }

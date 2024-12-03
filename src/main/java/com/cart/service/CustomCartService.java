@@ -1,77 +1,154 @@
 package com.cart.service;
 
-import com.cart.dto.CustomCart;
-import com.cart.util.HeaderUtils;
+import com.cart.db.CustomCart;
+import com.cart.db.CustomCartItem;
+import com.cart.db.CustomCartItemRepository;
+import com.cart.db.CustomCartRepository;
+import com.cart.dto.CartItemPositionUpdateDto;
+import com.cart.dto.CustomCartDto;
+import com.cart.dto.CustomCartItemDto;
+import com.cart.exception.CustomCartNotFoundException;
+import com.cart.exception.ItemNotFoundException;
+import com.cart.utils.HeaderUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomCartService {
 
-    private final RestTemplate restTemplate;
-    private static final String CUSTOM_CART_API_URL = "/api/cart/custom";
+    private final CustomCartRepository customCartRepository;
+    private final CustomCartItemRepository customCartItemRepository;  // CustomCartItemRepository 추가
 
     @Autowired
-    public CustomCartService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public CustomCartService(CustomCartRepository customCartRepository, CustomCartItemRepository customCartItemRepository) {
+        this.customCartRepository = customCartRepository;
+        this.customCartItemRepository = customCartItemRepository;  // repository 주입
     }
 
-    // 커스텀 장바구니 조회
-    public CustomCart getCustomCart(HttpServletRequest request) {
-        String userId = HeaderUtils.getUserIdFromHeaders(request);  // HttpServletRequest로 사용자 ID 추출
-        String url = CUSTOM_CART_API_URL + "/items";
-        try {
-            ResponseEntity<CustomCart> responseEntity = restTemplate.getForEntity(url, CustomCart.class, userId);
-            if (responseEntity.getStatusCode() != HttpStatus.OK) {
-                throw new RuntimeException("Failed to fetch custom cart");
+    private CustomCartItemDto convertToDto(CustomCartItem customCartItem) {
+        CustomCartItemDto customCartItemDto = new CustomCartItemDto();
+        customCartItemDto.setProductCode(customCartItem.getProductCode());
+        customCartItemDto.setQuantity(customCartItem.getQuantity());
+        return customCartItemDto;
+    }
+
+    private CustomCartDto convertToDto(CustomCart customCart) {
+        CustomCartDto customCartDto = new CustomCartDto();
+        customCartDto.setUserId(customCart.getUserId());
+        customCartDto.setCustomCartTitle(customCart.getCustomCartTitle());
+        List<CustomCartItemDto> itemDtos = customCart.getItems().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+        customCartDto.setItems(itemDtos);
+        return customCartDto;
+    }
+
+    public CustomCartDto getCustomCart(HttpServletRequest request) {
+        String userId = HeaderUtils.getUserId(request);
+        Optional<CustomCart> customCart = customCartRepository.findByUserId(userId);
+        if (customCart.isPresent()) {
+            return convertToDto(customCart.get());
+        } else {
+            throw new CustomCartNotFoundException("Custom cart not found for user: " + userId);
+        }
+    }
+
+    public CustomCartDto createCustomCart(CustomCartDto customCartDto, HttpServletRequest request) {
+        if (customCartDto.getCustomCartTitle() == null || customCartDto.getCustomCartTitle().isEmpty()) {
+            String baseTitle = "My Custom Cart";
+            String generatedTitle = generateUniqueTitle(baseTitle);
+            customCartDto.setCustomCartTitle(generatedTitle);
+        } else {
+            String uniqueTitle = generateUniqueTitle(customCartDto.getCustomCartTitle());
+            customCartDto.setCustomCartTitle(uniqueTitle);
+        }
+
+        String userId = HeaderUtils.getUserId(request);
+        customCartDto.setUserId(userId);
+
+        CustomCart customCart = new CustomCart();
+        customCart.setUserId(customCartDto.getUserId());
+        customCart.setCustomCartTitle(customCartDto.getCustomCartTitle());
+
+        List<CustomCartItem> items = customCartDto.getItems().stream()
+                .map(this::convertToDbEntity)
+                .collect(Collectors.toList());
+        customCart.setItems(items);
+
+        CustomCart savedCart = customCartRepository.save(customCart);
+        return convertToDto(savedCart);
+    }
+
+    private CustomCartItem convertToDbEntity(CustomCartItemDto customCartItemDto) {
+        CustomCartItem customCartItem = new CustomCartItem();
+        customCartItem.setProductCode(customCartItemDto.getProductCode());
+        customCartItem.setQuantity(customCartItemDto.getQuantity());
+        return customCartItem;
+    }
+
+    public void updateCartItemPosition(CartItemPositionUpdateDto dto) {
+        // 아이템 ID로 기존 장바구니 항목을 찾음
+        CustomCartItem item = customCartItemRepository.findById(dto.getItemId())
+                .orElseThrow(() -> new RuntimeException("Item not found"));
+
+        // 아이템의 좌표를 업데이트
+        item.setXCoordinate(dto.getXCoordinate());
+        item.setYCoordinate(dto.getYCoordinate());
+
+        // 데이터베이스에 변경사항 저장
+        customCartItemRepository.save(item);  // CustomCartItemRepository에 저장
+    }
+
+    public CustomCartDto updateCustomCartTitle(String newTitle, HttpServletRequest request) {
+        String userId = HeaderUtils.getUserId(request);
+        Optional<CustomCart> customCart = customCartRepository.findByUserId(userId);
+        if (customCart.isPresent()) {
+            CustomCart cart = customCart.get();
+            cart.setCustomCartTitle(newTitle);
+            customCartRepository.save(cart);
+            return convertToDto(cart);
+        } else {
+            throw new CustomCartNotFoundException("Custom cart not found for user: " + userId);
+        }
+    }
+
+    public CustomCartDto removeItemFromCustomCart(String productCode, HttpServletRequest request) {
+        String userId = HeaderUtils.getUserId(request);
+        Optional<CustomCart> customCart = customCartRepository.findByUserId(userId);
+        if (customCart.isPresent()) {
+            CustomCart cart = customCart.get();
+            List<CustomCartItem> items = cart.getItems();
+            CustomCartItem itemToRemove = null;
+            for (CustomCartItem item : items) {
+                if (item.getProductCode().equals(productCode)) {
+                    itemToRemove = item;
+                    break;
+                }
             }
-            return responseEntity.getBody();
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while accessing custom cart API", e);
-        }
-    }
-
-    // 커스텀 장바구니 생성
-    public CustomCart createCustomCart(CustomCart customCart, HttpServletRequest request) {
-        String userId = HeaderUtils.getUserIdFromHeaders(request);  // HttpServletRequest로 사용자 ID 추출
-        String url = CUSTOM_CART_API_URL;
-        try {
-            ResponseEntity<CustomCart> responseEntity = restTemplate.postForEntity(url, customCart, CustomCart.class, userId);
-            if (responseEntity.getStatusCode() != HttpStatus.OK) {
-                throw new RuntimeException("Failed to create custom cart");
+            if (itemToRemove != null) {
+                items.remove(itemToRemove);
+                customCartRepository.save(cart);
+                return convertToDto(cart);
+            } else {
+                throw new ItemNotFoundException("Item not found in custom cart");
             }
-            return responseEntity.getBody();
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while creating custom cart", e);
+        } else {
+            throw new CustomCartNotFoundException("Custom cart not found for user: " + userId);
         }
     }
 
-    // 커스텀 장바구니 제목 수정
-    public CustomCart updateCustomCartTitle(String newTitle, HttpServletRequest request) {
-        String userId = HeaderUtils.getUserIdFromHeaders(request);  // HttpServletRequest로 사용자 ID 추출
-        String url = CUSTOM_CART_API_URL + "/updateTitle";
-        try {
-            restTemplate.put(url, newTitle, userId);
-            return getCustomCart(request); // 제목 업데이트 후 커스텀 장바구니를 다시 불러옴
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while updating custom cart title", e);
+    private String generateUniqueTitle(String baseTitle) {
+        String newTitle = baseTitle;
+        int counter = 1;
+        while (customCartRepository.findByCustomCartTitle(newTitle).isPresent()) {
+            newTitle = baseTitle + " (" + counter + ")";
+            counter++;
         }
-    }
-
-    // 커스텀 장바구니에서 상품 제거
-    public CustomCart removeItemFromCustomCart(String productCode, HttpServletRequest request) {
-        String userId = HeaderUtils.getUserIdFromHeaders(request);  // HttpServletRequest로 사용자 ID 추출
-        String url = CUSTOM_CART_API_URL + "/items/{productCode}";
-        try {
-            restTemplate.delete(url, userId, productCode);
-            return getCustomCart(request); // 상품 제거 후 커스텀 장바구니를 다시 불러옴
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while removing item from custom cart", e);
-        }
+        return newTitle;
     }
 }

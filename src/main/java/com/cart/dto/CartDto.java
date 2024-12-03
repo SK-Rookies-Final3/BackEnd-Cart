@@ -2,9 +2,9 @@ package com.cart.dto;
 
 import java.util.List;
 
-public class Cart {
-    private String userId;  // 사용자 ID
-    private List<CartItem> items;  // 장바구니에 담긴 상품들
+public class CartDto {
+    private String userId;
+    private List<CartItemDto> items;
 
     // Getters and Setters
     public String getUserId() {
@@ -15,11 +15,11 @@ public class Cart {
         this.userId = userId;
     }
 
-    public List<CartItem> getItems() {
+    public List<CartItemDto> getItems() {
         return items;
     }
 
-    public void setItems(List<CartItem> items) {
+    public void setItems(List<CartItemDto> items) {
         this.items = items;
     }
 }

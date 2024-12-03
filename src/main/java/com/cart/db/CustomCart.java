@@ -14,14 +14,19 @@ import java.util.List;
 public class CustomCart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int code;  // 커스텀 장바구니 code
+    private int code;
+
+    @Column(name = "cart_code", nullable = false)
+    private Long cartCode;  // Long 타입으로 변경 (여기서는 cartCode를 Long으로 가정)``    *`**```````````                                     ``````**************
 
     @Column(name = "user_id", nullable = false, length = 50)
-    private String userId;  // 사용자 ID
+    private String userId;
 
     @Column(name = "custom_cart_title", length = 255)
-    private String customCartTitle; // 커스텀 장바구니 제목
+    private String customCartTitle;
 
     @OneToMany(mappedBy = "customCart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CustomCartItem> items;  // 커스텀 장바구니의 상품들
+    private List<CustomCartItem> items;
+
+    // Getter and Setter for userId and other fields
 }

@@ -2,10 +2,10 @@ package com.cart.dto;
 
 import java.util.List;
 
-public class CustomCart {
+public class CustomCartDto {
     private String userId;          // 사용자 ID
     private String customCartTitle; // 커스텀 장바구니 제목
-    private List<CustomCartItem> items; // 커스텀 장바구니의 상품들
+    private List<CustomCartItemDto> items; // 커스텀 장바구니의 상품들
 
     // Getters and Setters
     public String getUserId() {
@@ -24,11 +24,11 @@ public class CustomCart {
         this.customCartTitle = customCartTitle;
     }
 
-    public List<CustomCartItem> getItems() {
+    public List<CustomCartItemDto> getItems() {
         return items;
     }
 
-    public void setItems(List<CustomCartItem> items) {
+    public void setItems(List<CustomCartItemDto> items) {
         this.items = items;
     }
 }

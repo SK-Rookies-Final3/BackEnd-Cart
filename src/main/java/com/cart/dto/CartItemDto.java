@@ -1,12 +1,12 @@
 package com.cart.dto;
 
-public class CartItem {
-    private String productCode;  // 상품 코드
-    private String productName;  // 상품명
-    private String productImage; // 상품 이미지 URL
-    private int quantity;        // 수량
-    private String size;         // 사이즈
-    private String color;        // 색상
+public class CartItemDto {
+    private String productCode;
+    private String productName;
+    private String thumbnail_url;
+    private int quantity;
+    private String size;
+    private String color;
 
     // Getters and Setters
     public String getProductCode() {
@@ -25,12 +25,12 @@ public class CartItem {
         this.productName = productName;
     }
 
-    public String getProductImage() {
-        return productImage;
+    public String getThumbnail_url() {
+        return thumbnail_url;
     }
 
-    public void setProductImage(String productImage) {
-        this.productImage = productImage;
+    public void setThumbnail_url(String thumbnail_url) {
+        this.thumbnail_url = thumbnail_url;
     }
 
     public int getQuantity() {
