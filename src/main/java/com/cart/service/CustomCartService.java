@@ -9,8 +9,6 @@ import com.cart.dto.CustomCartDto;
 import com.cart.dto.CustomCartItemDto;
 import com.cart.exception.CustomCartNotFoundException;
 import com.cart.exception.ItemNotFoundException;
-import com.cart.utils.HeaderUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,8 +46,7 @@ public class CustomCartService {
         return customCartDto;
     }
 
-    public CustomCartDto getCustomCart(HttpServletRequest request) {
-        String userId = HeaderUtils.getUserId(request);
+    public CustomCartDto getCustomCart(String userId) {
         Optional<CustomCart> customCart = customCartRepository.findByUserId(userId);
         if (customCart.isPresent()) {
             return convertToDto(customCart.get());
@@ -58,7 +55,7 @@ public class CustomCartService {
         }
     }
 
-    public CustomCartDto createCustomCart(CustomCartDto customCartDto, HttpServletRequest request) {
+    public CustomCartDto createCustomCart(CustomCartDto customCartDto, String userId) {
         if (customCartDto.getCustomCartTitle() == null || customCartDto.getCustomCartTitle().isEmpty()) {
             String baseTitle = "My Custom Cart";
             String generatedTitle = generateUniqueTitle(baseTitle);
@@ -68,7 +65,6 @@ public class CustomCartService {
             customCartDto.setCustomCartTitle(uniqueTitle);
         }
 
-        String userId = HeaderUtils.getUserId(request);
         customCartDto.setUserId(userId);
 
         CustomCart customCart = new CustomCart();
@@ -104,8 +100,7 @@ public class CustomCartService {
         customCartItemRepository.save(item);  // CustomCartItemRepository에 저장
     }
 
-    public CustomCartDto updateCustomCartTitle(String newTitle, HttpServletRequest request) {
-        String userId = HeaderUtils.getUserId(request);
+    public CustomCartDto updateCustomCartTitle(String newTitle, String userId) {
         Optional<CustomCart> customCart = customCartRepository.findByUserId(userId);
         if (customCart.isPresent()) {
             CustomCart cart = customCart.get();
@@ -117,8 +112,7 @@ public class CustomCartService {
         }
     }
 
-    public CustomCartDto removeItemFromCustomCart(String productCode, HttpServletRequest request) {
-        String userId = HeaderUtils.getUserId(request);
+    public CustomCartDto removeItemFromCustomCart(String productCode, String userId) {
         Optional<CustomCart> customCart = customCartRepository.findByUserId(userId);
         if (customCart.isPresent()) {
             CustomCart cart = customCart.get();

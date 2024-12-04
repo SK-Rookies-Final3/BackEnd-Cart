@@ -3,20 +3,19 @@ package com.cart.service;
 import com.cart.dto.CartDto;
 import com.cart.dto.CartItemDto;
 import com.cart.dto.ProductResponse;
-import com.cart.utils.HeaderUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @Service
 public class CartService {
 
     private final RestTemplate restTemplate;
     private static final String CART_API_URL = "/api/cart";
-    private static final String PRODUCT_API_URL = "/open-api/brand/product/";
+    private static final String PRODUCT_API_URL = "http://8089/open-api/brand/product/";
 
     @Autowired
     public CartService(RestTemplate restTemplate) {
@@ -24,8 +23,7 @@ public class CartService {
     }
 
     // 장바구니 조회
-    public CartDto getCart(HttpServletRequest request) {
-        String userId = HeaderUtils.getUserId(request);  // HttpServletRequest로 사용자 ID 추출
+    public CartDto getCart(@RequestHeader("X-User-Id") String userId) {
         String url = CART_API_URL + "/items";
         try {
             ResponseEntity<CartDto> responseEntity = restTemplate.getForEntity(url, CartDto.class, userId);
@@ -39,8 +37,7 @@ public class CartService {
     }
 
     // 장바구니 상품 추가
-    public CartDto addItemToCart(HttpServletRequest request, CartItemDto cartItemDto) {
-        String userId = HeaderUtils.getUserId(request);
+    public CartDto addItemToCart(@RequestHeader("X-User-Id") String userId, CartItemDto cartItemDto) {
         String productUrl = PRODUCT_API_URL + cartItemDto.getProductCode();
 
         try {
@@ -70,14 +67,12 @@ public class CartService {
         }
     }
 
-
     // 장바구니 상품 제거
-    public CartDto removeItemFromCart(HttpServletRequest request, String productCode) {
-        String userId = HeaderUtils.getUserId(request);
+    public CartDto removeItemFromCart(@RequestHeader("X-User-Id") String userId, String productCode) {
         String url = CART_API_URL + "/items/{productCode}";
         try {
             restTemplate.delete(url, userId, productCode);
-            return getCart(request);
+            return getCart(userId);
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while removing item from cart", e);
         }
