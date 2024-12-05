@@ -40,6 +40,9 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'  // 최신 버전
+	testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'  // 최신 버전
+	testImplementation 'org.mockito:mockito-core:3.9.0'  // 최신 버전
 }
 
 dependencyManagement {
@@ -49,5 +52,8 @@ dependencyManagement {
 }
 
 tasks.named('test') {
+	useJUnitPlatform()
+}
+test {
 	useJUnitPlatform()
 }

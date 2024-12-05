@@ -16,5 +16,5 @@ eureka:
     lease-renewal-interval-in-seconds: 10
     lease-expiration-duration-in-seconds: 30
 
-  resources:
-    static-locations: classpath:/static/
+resources:
+  static-locations: classpath:/static/
