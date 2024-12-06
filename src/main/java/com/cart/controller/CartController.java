@@ -21,12 +21,18 @@ public class CartController {
         this.cartService = cartService;
     }
 
+
+     // 장바구니 항목 목록 가져오기
+
     @GetMapping("/items")
     public ResponseEntity<List<CartItem>> getCartItems(@RequestHeader("X-User-Id") String userId) {
         log.info("Fetching cart items for userId: {}", userId);
         List<CartItem> cartItems = cartService.getCartItems(userId);
         return ResponseEntity.ok(cartItems);
     }
+
+
+     // 장바구니에 항목 추가하기
 
     @PostMapping("/items")
     public ResponseEntity<CartItem> addItemToCart(@RequestHeader("X-User-Id") String userId, @RequestBody CartItem cartItem) {
@@ -35,12 +41,18 @@ public class CartController {
         return ResponseEntity.noContent().build();
     }
 
+
+     // 장바구니에서 항목 제거하기
+
     @DeleteMapping("/items/{id}")
     public ResponseEntity<Void> removeItemFromCart(@RequestHeader("X-User-Id") String userId, @PathVariable Long id) {
         log.info("Removing productCode {} from cart for userId: {}", id, userId);
         cartService.removeItemFromCart(userId, id);
         return ResponseEntity.noContent().build();
     }
+
+
+     // 커스텀 장바구니 항목 목록 가져오기
 
     @GetMapping("/custom")
     public ResponseEntity<List<CustomCart>> getCustomCartItems(@RequestHeader("X-User-Id") String userId) {
@@ -49,6 +61,9 @@ public class CartController {
         return ResponseEntity.ok(customCarts);
     }
 
+
+     // 커스텀 장바구니 생성하기
+
     @PostMapping("/custom")
     public ResponseEntity<CustomCart> createCustomCart(@RequestHeader("X-User-Id") String userId, @RequestBody CustomCart customCart) {
         log.info("Creating custom cart for userId: {}", userId);
@@ -56,12 +71,30 @@ public class CartController {
         return ResponseEntity.status(201).body(createdCart);
     }
 
+
+     //커스텀 장바구니에 항목 추가하기
+
     @PostMapping("/custom/item")
     public ResponseEntity<CustomCartItem> addItemToCustomCart(@RequestHeader("X-User-Id") String userId, @PathVariable String customCartId, @RequestBody CustomCartItem customCartItem) {
         log.info("Adding item to custom cart {} for userId: {}", customCartId, userId);
         CustomCartItem addedItem = cartService.addItemToCustomCart(userId, customCartId, customCartItem);
         return ResponseEntity.status(201).body(addedItem);
     }
+
+
+     //커스텀 장바구니 제목 수정하기
+    @PutMapping("/custom/{customCartId}/title")
+    public ResponseEntity<CustomCart> updateCustomCartTitle(
+            @RequestHeader("X-User-Id") String userId,
+            @PathVariable Long customCartId,
+            @RequestParam String newTitle) {
+        log.info("Updating title for custom cart {} for userId: {}", customCartId, userId);
+        CustomCart updatedCart = cartService.updateCustomCartTitle(customCartId, newTitle);
+        return ResponseEntity.ok(updatedCart);
+    }
+
+
+     //커스텀 장바구니에서 항목 제거하기
 
     @DeleteMapping("/custom/item/{itemCode}")
     public ResponseEntity<Void> removeItemFromCustomCart(@RequestHeader("X-User-Id") String userId, @PathVariable String customCartId, @PathVariable String itemCode) {
