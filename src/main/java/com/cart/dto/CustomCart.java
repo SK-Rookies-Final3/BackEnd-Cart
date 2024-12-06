@@ -1,5 +1,6 @@
 package com.cart.dto;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,11 +12,16 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class CustomCart {
-    private String id;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String userId;
     private String title;
-    private List<CustomCartItem> items;
 
-    // getters and setters
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CustomCartItem> items;  // 커스텀 장바구니에 포함된 아이템들
 }
