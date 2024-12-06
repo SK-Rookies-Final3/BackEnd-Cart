@@ -24,6 +24,8 @@ public class CustomCartItem {
     private String size;
     private String color;
 
-    private int xCoordinate;
-    private int yCoordinate;
+    @Column(name = "`left`")
+    private int left;
+
+    private int top;
 }

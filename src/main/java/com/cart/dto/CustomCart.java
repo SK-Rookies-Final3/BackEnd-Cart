@@ -17,7 +17,7 @@ public class CustomCart {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long tabId;
 
     private String userId;
     private String title;
