@@ -16,6 +16,7 @@ import java.util.Optional;
 @Service
 public class CartService {
 
+    private List<CustomCart> customCarts = new ArrayList<>();
     private final CartItemRepository cartItemRepository;
     private final CustomCartRepository customCartRepository;
 
@@ -27,6 +28,23 @@ public class CartService {
     // 장바구니 항목 추가
     public CartItem addItemToCart(String userId, CartItem cartItem) {
         log.info("Adding productCode {} to cart for userId: {}", cartItem.getProductCode(), userId);
+
+        // 동일한 userId와 productCode를 가진 장바구니 항목이 이미 존재하는지 확인
+        Optional<CartItem> existingCartItem = cartItemRepository.findAll()
+                .stream()
+                .filter(item -> item.getProductCode().equals(cartItem.getProductCode()))
+                .findFirst();
+
+        // 중복된 항목이 있다면, quantity만 증가시키기
+        if (existingCartItem.isPresent()) {
+            CartItem existingItem = existingCartItem.get();
+            existingItem.setQuantity(existingItem.getQuantity() + cartItem.getQuantity()); // 수량을 더함
+            cartItemRepository.save(existingItem);  // 기존 항목 업데이트
+            log.info("Updated quantity for productCode {} in cart for userId: {}", cartItem.getProductCode(), userId);
+            return existingItem;  // 업데이트된 항목 반환
+        }
+
+        // 중복된 항목이 없다면 새 항목을 추가
         return cartItemRepository.save(cartItem);
     }
 
@@ -66,6 +84,61 @@ public class CartService {
             existingCart = customCartRepository.findByUserIdAndTitle(userId, customCart.getTitle());
         }
 
+        return customCartRepository.save(customCart);
+    }
+
+    // 선택된 장바구니 항목으로 커스텀 장바구니 생성
+    public CustomCart createCustomCartFromCart(String userId, List<Long> cartItemIds, String customCartTitle) {
+        log.info("Creating custom cart for userId: {} from cart items", userId);
+
+        // 장바구니 항목 ID로 항목들을 가져옵니다.
+        List<CartItem> cartItems = cartItemRepository.findAllById(cartItemIds);
+
+        // 제목이 없으면 기본 제목을 생성
+        if (customCartTitle == null || customCartTitle.isEmpty()) {
+            customCartTitle = generateUniqueTitle(userId);
+        }
+
+        // 제목 중복 방지 처리
+        Optional<CustomCart> existingCart = customCartRepository.findByUserIdAndTitle(userId, customCartTitle);
+        int count = 1;
+        while (existingCart.isPresent()) {
+            customCartTitle = customCartTitle + " (" + count + ")";
+            count++;
+            existingCart = customCartRepository.findByUserIdAndTitle(userId, customCartTitle);
+        }
+
+        // 커스텀 장바구니 생성
+        List<CustomCartItem> customCartItems = new ArrayList<>();
+        for (CartItem cartItem : cartItems) {
+            customCartItems.add(new CustomCartItem(
+                    null, cartItem.getProductCode(), cartItem.getProductName(),
+                    cartItem.getProductImage(), cartItem.getQuantity(),
+                    cartItem.getSize(), cartItem.getColor(), 0, 0 // 기본 좌표 값
+            ));
+        }
+
+        CustomCart customCart = new CustomCart(null, userId, customCartTitle, customCartItems);
+        return customCartRepository.save(customCart);
+    }
+
+    // 커스텀 장바구니 제목 수정
+    public CustomCart updateCustomCartTitle(Long customCartId, String newTitle) {
+        log.info("Updating custom cart title to {}", newTitle);
+
+        CustomCart customCart = customCartRepository.findById(customCartId)
+                .orElseThrow(() -> new IllegalArgumentException("Custom cart not found"));
+
+        // 제목 중복 처리
+        Optional<CustomCart> existingCart = customCartRepository.findByUserIdAndTitle(customCart.getUserId(), newTitle);
+        int count = 1;
+        while (existingCart.isPresent()) {
+            newTitle = newTitle + " (" + count + ")";
+            count++;
+            existingCart = customCartRepository.findByUserIdAndTitle(customCart.getUserId(), newTitle);
+        }
+
+        customCart.setTitle(newTitle);
         return customCartRepository.save(customCart);
     }
 
