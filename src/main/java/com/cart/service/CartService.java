@@ -147,6 +147,18 @@ public class CartService {
         return "Custom Cart for " + userId;
     }
 
+    // 커스텀 장바구니 삭제
+    public void deleteCustomCart(String userId, Long customCartId) {
+        log.info("Deleting custom cart {} for userId: {}", customCartId, userId);
+        CustomCart customCart = customCartRepository.findById(customCartId)
+                .orElseThrow(() -> new IllegalArgumentException("Custom cart not found"));
+
+        if (!customCart.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("User does not own this custom cart");
+        }
+
+        customCartRepository.delete(customCart);
+    }
     // 커스텀 장바구니 아이템 추가
     public CustomCartItem addItemToCustomCart(String userId, String customCartId, CustomCartItem customCartItem) {
         log.info("Adding item {} to custom cart {} for userId: {}", customCartItem.getItemCode(), customCartId, userId);
@@ -160,13 +172,5 @@ public class CartService {
         return customCartItem;
     }
 
-    // 커스텀 장바구니 아이템 삭제
-    public void removeItemFromCustomCart(String userId, String customCartId, String itemCode) {
-        log.info("Removing item {} from custom cart {} for userId: {}", itemCode, customCartId, userId);
-        CustomCart customCart = customCartRepository.findById(Long.parseLong(customCartId))
-                .orElseThrow(() -> new IllegalArgumentException("Custom cart not found"));
 
-        customCart.getItems().removeIf(item -> item.getItemCode().equals(itemCode));
-        customCartRepository.save(customCart);
-    }
 }
