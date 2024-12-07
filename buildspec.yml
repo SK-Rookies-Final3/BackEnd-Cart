@@ -33,7 +33,7 @@ phases:
       - echo "Build completed, checking for JAR file:"
       - ls build/libs/  # build/libs 경로의 파일 목록을 출력하여 JAR 파일 생성 확인
       - test -f build/libs/*.jar || { echo "JAR file not found"; exit 1; }
-      - cp build/libs/APIgateway-0.0.1-SNAPSHOT.jar app.jar  # Dockerfile에서 사용하기 위해 app.jar로 복사
+      - cp build/libs/cart-0.0.1-SNAPSHOT.jar app.jar  # Dockerfile에서 사용하기 위해 app.jar로 복사
       - echo "Docker build 시작"
       - echo Building the Docker image...
       - docker build -t $ECR_URL/$BACKEND_ECR_REPO:$IMAGE_TAG .
