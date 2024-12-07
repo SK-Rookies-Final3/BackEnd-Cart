@@ -16,6 +16,7 @@ phases:
       - timeout 15 sh -c "until docker info; do echo 'Waiting for Docker to start...'; sleep 1; done"
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_URL
+      - cd order
       - chmod +x ./gradlew
       - echo Configuring Git for GitHub...
       - git config --global credential.helper store
@@ -36,8 +37,8 @@ phases:
       - cp build/libs/cart-0.0.1-SNAPSHOT.jar app.jar  # Dockerfile에서 사용하기 위해 app.jar로 복사
       - echo "Docker build 시작"
       - echo Building the Docker image...
-      - docker build -t $ECR_URL/$BACKEND_ECR_REPO:$IMAGE_TAG .
-      - docker tag $ECR_URL/$BACKEND_ECR_REPO:$IMAGE_TAG $ECR_URL/$BACKEND_ECR_REPO:$IMAGE_TAG
+      - docker build -t $BACKEND_ECR_REPO:$IMAGE_TAG .
+      - docker tag $BACKEND_ECR_REPO:$IMAGE_TAG $ECR_URL/$BACKEND_ECR_REPO:$IMAGE_TAG
 
   post_build:
     commands:
@@ -59,8 +60,8 @@ phases:
       - echo Committing changes to values.yaml...
       - git config --global user.name "CodeBuild"
       - git config --global user.email "codebuild@example.com"
-      - git add ./helm-charts/values.yaml ./helm-charts/Chart.yaml
-      - git commit -m "Update backendTimestamp and chart version to $IMAGE_TAG at Cart" || echo "No changes to commit"
+      - git add ./helm-charts/values.yaml
+      - git commit -m "Update helm chart $IMAGE_TAG at Cart" || echo "No changes to commit"
       - git push origin main || echo "No changes to push"
 
 artifacts:
