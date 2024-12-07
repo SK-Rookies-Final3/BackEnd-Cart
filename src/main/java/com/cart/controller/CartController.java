@@ -95,7 +95,7 @@ public class CartController {
 
 
     // 커스텀 장바구니 삭제하기
-    @DeleteMapping("/custom/item/{itemCode}")
+    @DeleteMapping("/custom/{customCartId}")
     public ResponseEntity<Void> deleteCustomCart(@RequestHeader("X-User-Id") String userId, @PathVariable Long customCartId) {
         log.info("Deleting custom cart {} for userId: {}", customCartId, userId);
         cartService.deleteCustomCart(userId, customCartId);
