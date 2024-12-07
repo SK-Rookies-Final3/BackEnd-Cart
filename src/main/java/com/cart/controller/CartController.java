@@ -95,10 +95,11 @@ public class CartController {
 
 
     // 커스텀 장바구니 삭제하기
-    @DeleteMapping("/custom/{customCartId}")
-    public ResponseEntity<Void> deleteCustomCart(@RequestHeader("X-User-Id") String userId, @PathVariable Long customCartId) {
-        log.info("Deleting custom cart {} for userId: {}", customCartId, userId);
-        cartService.deleteCustomCart(userId, customCartId);
+    @DeleteMapping("/custom/{tabid}")
+    public ResponseEntity<Void> deleteCustomCart(@RequestHeader("X-User-Id") String userId, @PathVariable Long tabid) {
+        log.info("Deleting custom cart {} for userId: {}", tabid, userId);
+        cartService.deleteCustomCart(userId, tabid);
         return ResponseEntity.noContent().build();
     }
+
 }

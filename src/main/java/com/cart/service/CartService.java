@@ -148,9 +148,9 @@ public class CartService {
     }
 
     // 커스텀 장바구니 삭제
-    public void deleteCustomCart(String userId, Long customCartId) {
-        log.info("Deleting custom cart {} for userId: {}", customCartId, userId);
-        CustomCart customCart = customCartRepository.findById(customCartId)
+    public void deleteCustomCart(String userId, Long tabid) {
+        log.info("Deleting custom cart {} for userId: {}", tabid, userId);
+        CustomCart customCart = customCartRepository.findById(tabid)
                 .orElseThrow(() -> new IllegalArgumentException("Custom cart not found"));
 
         if (!customCart.getUserId().equals(userId)) {
@@ -159,6 +159,7 @@ public class CartService {
 
         customCartRepository.delete(customCart);
     }
+
     // 커스텀 장바구니 아이템 추가
     public CustomCartItem addItemToCustomCart(String userId, String customCartId, CustomCartItem customCartItem) {
         log.info("Adding item {} to custom cart {} for userId: {}", customCartItem.getItemCode(), customCartId, userId);
