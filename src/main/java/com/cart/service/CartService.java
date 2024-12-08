@@ -50,18 +50,18 @@ public class CartService {
         return cartItemRepository.save(cartItem);
     }
 
-    // 수량 증가만 수행하는 메서드
-    public CartItem increaseQuantity(String userId, Long cartItemId, int quantityToAdd) {
-        log.info("Increasing quantity for cartItemId {} for userId: {} by {}", cartItemId, userId, quantityToAdd);
+    // 수량 변경
+    public CartItem updateQuantity(String userId, Long cartItemId, int newQuantity) {
+        log.info("Updating quantity for cartItemId {} for userId: {} to {}", cartItemId, userId, newQuantity);
 
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
 
-        cartItem.setQuantity(cartItem.getQuantity() + quantityToAdd);
+        cartItem.setQuantity(newQuantity);
 
         cartItemRepository.save(cartItem);
 
-        log.info("Updated quantity for cartItemId {} for userId: {}", cartItemId, userId);
+        log.info("Updated quantity for cartItemId {} for userId: {} to {}", cartItemId, userId, newQuantity);
 
         return cartItem;
     }
@@ -76,7 +76,7 @@ public class CartService {
     // 장바구니 항목 조회
     public List<CartItem> getCartItems(String userId) {
         log.info("Fetching cart items for userId: {}", userId);
-        return cartItemRepository.findAll();
+        return cartItemRepository.findByUserId(userId);
     }
 
     // 커스텀 장바구니 항목 조회

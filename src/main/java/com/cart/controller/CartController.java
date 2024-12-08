@@ -41,15 +41,16 @@ public class CartController {
         return ResponseEntity.noContent().build();
     }
 
-    // 장바구니 항목 수량 증가
+    // 장바구니 항목 수량 변경
     @PutMapping("/items/increase/{id}")
-    public ResponseEntity<CartItem> increaseItemQuantity(@RequestHeader("X-User-Id") String userId,
-                                                         @PathVariable Long id,
-                                                         @RequestParam int quantity) {
-        log.info("Increasing quantity for cartItemId: {} by {}", id, quantity);
-        CartItem updatedItem = cartService.increaseQuantity(userId, id, quantity);
+    public ResponseEntity<CartItem> updateItemQuantity(@RequestHeader("X-User-Id") String userId,
+                                                       @PathVariable Long id,
+                                                       @RequestParam int quantity) {
+        log.info("Updating quantity for cartItemId: {} to {}", id, quantity);
+        CartItem updatedItem = cartService.updateQuantity(userId, id, quantity);
         return ResponseEntity.ok(updatedItem);
     }
+
 
 
 
