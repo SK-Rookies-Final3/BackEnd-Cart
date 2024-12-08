@@ -29,6 +29,8 @@ public class CartService {
     public CartItem addItemToCart(String userId, CartItem cartItem) {
         log.info("Adding productCode {} to cart for userId: {}", cartItem.getProductCode(), userId);
 
+        cartItem.setUserId(userId);
+
         // 동일한 userId와 productCode를 가진 장바구니 항목이 이미 존재하는지 확인
         Optional<CartItem> existingCartItem = cartItemRepository.findAll()
                 .stream()
@@ -47,6 +49,23 @@ public class CartService {
         // 중복된 항목이 없다면 새 항목을 추가
         return cartItemRepository.save(cartItem);
     }
+
+    // 수량 증가만 수행하는 메서드
+    public CartItem increaseQuantity(String userId, Long cartItemId, int quantityToAdd) {
+        log.info("Increasing quantity for cartItemId {} for userId: {} by {}", cartItemId, userId, quantityToAdd);
+
+        CartItem cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
+
+        cartItem.setQuantity(cartItem.getQuantity() + quantityToAdd);
+
+        cartItemRepository.save(cartItem);
+
+        log.info("Updated quantity for cartItemId {} for userId: {}", cartItemId, userId);
+
+        return cartItem;
+    }
+
 
     // 장바구니 항목 삭제
     public void removeItemFromCart(String userId, Long id) {
