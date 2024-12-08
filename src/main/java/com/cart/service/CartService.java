@@ -31,11 +31,7 @@ public class CartService {
 
         cartItem.setUserId(userId);
 
-        // 동일한 userId와 productCode를 가진 장바구니 항목이 이미 존재하는지 확인
-        Optional<CartItem> existingCartItem = cartItemRepository.findAll()
-                .stream()
-                .filter(item -> item.getProductCode().equals(cartItem.getProductCode()))
-                .findFirst();
+        Optional<CartItem> existingCartItem = cartItemRepository.findByUserIdAndProductCode(userId, cartItem.getProductCode());
 
         // 중복된 항목이 있다면, quantity만 증가시키기
         if (existingCartItem.isPresent()) {
@@ -49,6 +45,7 @@ public class CartService {
         // 중복된 항목이 없다면 새 항목을 추가
         return cartItemRepository.save(cartItem);
     }
+
 
     // 수량 변경
     public CartItem updateQuantity(String userId, Long cartItemId, int newQuantity) {
