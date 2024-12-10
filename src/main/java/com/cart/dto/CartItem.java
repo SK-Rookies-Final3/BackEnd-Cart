@@ -23,11 +23,12 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     //    @Column(name = "product_code", nullable = false, unique = true)
-    private String productCode;
+    private int userId;
+    private int productCode;
     private String productName;
     private String productImage;
     private int quantity;
     private String size;
     private String color;
-    private double price;
+    private int price;
 }
