@@ -30,5 +30,5 @@ public class CartItem {
     private int quantity;
     private String size;
     private String color;
-    private int productCode;
+    private int price;
 }
