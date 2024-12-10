@@ -19,7 +19,7 @@ public class CustomCart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tabId;
 
-    private String userId;
+    private Integer userId;
     private String title;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)

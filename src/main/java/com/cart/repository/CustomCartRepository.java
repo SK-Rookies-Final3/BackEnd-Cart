@@ -6,6 +6,6 @@ import java.util.Optional;
 import java.util.List;
 
 public interface CustomCartRepository extends JpaRepository<CustomCart, Long> {
-    Optional<CustomCart> findByUserIdAndTitle(String userId, String title);
-    List<CustomCart> findByUserId(String userId);
+    Optional<CustomCart> findByUserIdAndTitle(int userId, String title);
+    List<CustomCart> findByUserId(int userId);
 }
